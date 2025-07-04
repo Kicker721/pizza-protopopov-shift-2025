@@ -9,5 +9,5 @@ interface CartRepository {
 
     fun getItems(): List<CartItem>
 
-    fun getTotalPrice(): Long
+    fun getTotalPrice(): Int
 }

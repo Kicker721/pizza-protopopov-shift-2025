@@ -1,13 +1,13 @@
-package com.kicker721.pigeonpizza.pizza.domain.entity
+package com.kicker721.pigeonpizza.pizza.data.model
 
-data class Pizza(
+data class PizzaModel (
     val id: String,
     val name: String,
-    val ingredients: List<Ingredient>,
-    val toppings: List<Ingredient>,
+    val ingredients: List<IngredientModel>,
+    val toppings: List<IngredientModel>,
     val description: String,
-    val sizes: List<Size>,
-    val doughs: List<Dough>,
+    val sizes: List<SizeModel>,
+    val doughs: List<DoughModel>,
     val calories: Int,
     val protein: String,
     val totalFat: String,
@@ -19,10 +19,4 @@ data class Pizza(
     val isNew: Boolean,
     val isHit: Boolean,
     val img: String,
-){
-    fun getBasePrice(): Int{
-        return ingredients.sumOf { it.price }
-    }
-}
-
-
+)
