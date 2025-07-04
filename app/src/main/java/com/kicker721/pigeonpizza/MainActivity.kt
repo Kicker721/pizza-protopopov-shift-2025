@@ -7,41 +7,45 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.kicker721.pigeonpizza.pizza.data.converter.PizzaConverter
+import com.kicker721.pigeonpizza.pizza.data.datasource.PizzaApiDataSource
+import com.kicker721.pigeonpizza.pizza.data.repository.PizzaRepositoryImpl
+import com.kicker721.pigeonpizza.pizza.domain.usecase.GetPizzaCatalogUseCase
+import com.kicker721.pigeonpizza.pizza.presentation.PizzaCatalogViewModel
+import com.kicker721.pigeonpizza.pizza.presentation.ui.PizzaCatalogScreen
 import com.kicker721.pigeonpizza.ui.theme.PigeonPizzaTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val viewModel = PizzaCatalogViewModel(
+            GetPizzaCatalogUseCase(
+                PizzaRepositoryImpl(
+                    PizzaApiDataSource(),
+                    PizzaConverter()
+                )
+            )
+        )
+
         setContent {
             PigeonPizzaTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                val state by viewModel.state.collectAsState()
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
+                    PizzaCatalogScreen(
+                        state = state,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
         }
-    }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PigeonPizzaTheme {
-        Greeting("Android")
     }
 }

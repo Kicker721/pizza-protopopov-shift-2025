@@ -19,6 +19,10 @@ data class Pizza(
     val isNew: Boolean,
     val isHit: Boolean,
     val img: String,
-)
+){
+    fun getBasePrice(): Int{
+        return ingredients.sumOf { it.price }
+    }
+}
 
 
