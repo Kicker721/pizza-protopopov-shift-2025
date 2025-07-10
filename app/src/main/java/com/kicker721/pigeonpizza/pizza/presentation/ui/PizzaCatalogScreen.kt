@@ -1,73 +1,145 @@
 package com.kicker721.pigeonpizza.pizza.presentation.ui
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
+import com.kicker721.pigeonpizza.R
+import com.kicker721.pigeonpizza.pizza.data.datasource.MockPizzaDataSource
 import com.kicker721.pigeonpizza.pizza.domain.entity.Pizza
 import com.kicker721.pigeonpizza.pizza.presentation.PizzaCatalogState
+import com.kicker721.pigeonpizza.pizza.presentation.PizzaCatalogViewModel
+import com.kicker721.pigeonpizza.pizza.presentation.ui.common.AppBar
+import com.kicker721.pigeonpizza.pizza.presentation.ui.common.CoilImage
+import com.kicker721.pigeonpizza.ui.theme.pizzaColorScheme
 
 @Composable
-fun PizzaCatalogScreen(state: PizzaCatalogState, modifier: Modifier) {
-    when (state) {
-        is PizzaCatalogState.Loading -> Text(
-            text = "Загрузка...",
-            modifier = modifier
-        )
+fun PizzaCatalogScreen(
+    viewModel: PizzaCatalogViewModel, modifier: Modifier,
+    onItemClick: (Pizza) -> Unit
+) {
+    LaunchedEffect(Unit) {
+        viewModel.loadPizzas()
+    }
 
-        is PizzaCatalogState.Error -> Text(
-            text = "Ошибка: ${state.message}",
-            modifier = modifier
-        )
+    val state by viewModel.state.collectAsState(PizzaCatalogState.Loading)
+    Column {
+        AppBar()
 
-        is PizzaCatalogState.Success -> {
-            LazyColumn(
-                modifier = modifier
-            ) {
-                state.pizzas.forEach { pizza ->
-                    item { PizzaCatalogItem(pizza) }
-                }
+        when (val currentState = state) {
+            is PizzaCatalogState.Loading -> LoadingScreen(modifier)
+
+            is PizzaCatalogState.Error -> ErrorScreen(currentState, modifier)
+
+            is PizzaCatalogState.Content -> {
+                Content(modifier, currentState.pizzas, onItemClick)
             }
         }
     }
+
 }
 
 @Composable
-fun PizzaCatalogItem(pizza: Pizza) {
-    Row(Modifier.padding(vertical = 8.dp)) {
-        AsyncImage(
-            model = "https://shift-intensive.ru/api" + pizza.img,
-            contentDescription = null,
-            modifier = Modifier.size(130.dp)
+private fun Content(
+    modifier: Modifier,
+    pizzas: List<Pizza>,
+    onItemClick: (Pizza) -> Unit
+) {
+    LazyColumn(
+        modifier = modifier
+            .padding(start = 24.dp, end = 24.dp, top = 24.dp),
+        contentPadding = PaddingValues(bottom = 80.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(pizzas, key = { it.id }) { pizza ->
+            PizzaCatalogItem(pizza, onItemClick)
+        }
+    }
+}
+
+@Composable
+private fun ErrorScreen(
+    state: PizzaCatalogState.Error,
+    modifier: Modifier
+) {
+    Box(contentAlignment = Alignment.Center) {
+        Text(
+            text = stringResource(
+                R.string.pizza_loading_error,
+                state.message ?: stringResource(R.string.unknown_error)
+            ),
+            modifier = modifier
         )
-        Column(Modifier.padding(start = 16.dp)) {
+    }
+}
+
+@Composable
+private fun LoadingScreen(modifier: Modifier) {
+    Box(contentAlignment = Alignment.Center) {
+
+        Text(
+            text = stringResource(R.string.loading),
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+fun PizzaCatalogItem(pizza: Pizza, onClick: (Pizza) -> Unit) {
+    Row(
+        Modifier
+            .clickable(onClick = { onClick(pizza) })
+    ) {
+        CoilImage(
+            url = pizza.img,
+            modifier = Modifier.size(130.dp),
+        )
+        Column(Modifier.padding(start = 16.dp, top = 8.dp)) {
             Text(
                 text = pizza.name,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.bodyLarge
             )
+
             Text(
-                modifier = Modifier.padding(top = 8.dp),
+                modifier = Modifier.padding(top = 12.dp),
                 text = pizza.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.pizzaColorScheme.textSecondary
             )
+
             Text(
-                modifier = Modifier.padding(top = 8.dp),
-                text = "от ${pizza.getBasePrice()} ₽"
+                modifier = Modifier.padding(top = 12.dp),
+                text = stringResource(R.string.price_from, pizza.getBasePrice()),
+                style = MaterialTheme.typography.bodyLarge
+
             )
         }
     }
 }
 
 
-//@Preview(showBackground = true)
-//@Composable
-//fun PizzaCatalogScreenPreview() {
-//    PizzaCatalogScreen(MockPizzaDataSource.pizzas,)
-//}
+@Preview(showBackground = true)
+@Composable
+fun PizzaCatalogScreenPreview() {
+    Content(
+        Modifier.padding(8.dp),
+        pizzas = MockPizzaDataSource.pizzas
+    ) {}
+}

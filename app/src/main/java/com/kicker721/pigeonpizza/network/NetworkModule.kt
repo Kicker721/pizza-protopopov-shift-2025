@@ -1,12 +1,12 @@
 package com.kicker721.pigeonpizza.network
 
+import com.kicker721.pigeonpizza.BASE_URL
 import com.kicker721.pigeonpizza.pizza.data.api.PizzaApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-private const val BASE_URL = "https://shift-intensive.ru/api/"
 private const val CONNECT_TIMEOUT = 10L
 
 object NetworkModule {
