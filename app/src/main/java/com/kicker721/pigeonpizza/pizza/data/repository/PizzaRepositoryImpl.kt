@@ -14,4 +14,10 @@ class PizzaRepositoryImpl(
         val pizzaModels = pizzaApiDataSource.getAll()
         return pizzaModels.map { pizzaConverter.toDomain(it) }
     }
+
+    override suspend fun getById(id: String): Pizza {
+        val pizzaModels = pizzaApiDataSource.getAll()
+        val pizzas = pizzaModels.map { pizzaConverter.toDomain(it) }
+        return pizzas.first { it.id == id }
+    }
 }

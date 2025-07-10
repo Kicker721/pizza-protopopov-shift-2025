@@ -1,5 +1,6 @@
 package com.kicker721.pigeonpizza.pizza.domain.entity.enums
 
+
 enum class IngredientType{
     PINEAPPLE,
     MOZZARELLA,

@@ -23,7 +23,7 @@ class PizzaConverter {
             description = pizzaModel.description,
             sizes = pizzaModel.sizes.map { toDomain(it) },
             doughs = pizzaModel.doughs.map { toDomain(it) },
-            calories = pizzaModel.calories.toInt(),
+            calories = pizzaModel.calories,
             protein = pizzaModel.protein,
             totalFat = pizzaModel.totalFat,
             carbohydrates = pizzaModel.carbohydrates,
@@ -37,25 +37,25 @@ class PizzaConverter {
         )
     }
 
-    fun toDomain(ingredientModel: IngredientModel): Ingredient {
+    private fun toDomain(ingredientModel: IngredientModel): Ingredient {
         return Ingredient(
             type = IngredientType.valueOf(ingredientModel.type),
-            price = ingredientModel.price.toInt(),
+            price = ingredientModel.price,
             img = ingredientModel.img
         )
     }
 
-    fun toDomain(sizeModel: SizeModel): Size {
+    private fun toDomain(sizeModel: SizeModel): Size {
         return Size(
             type = SizeType.valueOf(sizeModel.type),
-            price = sizeModel.price.toInt()
+            price = sizeModel.price
         )
     }
 
-    fun toDomain(doughModel: DoughModel): Dough {
+    private fun toDomain(doughModel: DoughModel): Dough {
         return Dough(
             type = DoughType.valueOf(doughModel.type),
-            price = doughModel.price.toInt()
+            price = doughModel.price
         )
     }
 }
